@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donkey Mascot</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg-start: #f6efe4;
+      --bg-end: #e4d3b8;
+      --panel: rgba(255, 252, 247, 0.85);
+      --text: #3d2a1b;
+      --button: #8f5a31;
+      --button-hover: #754725;
+      --button-text: #fff8ef;
+      --shadow: rgba(61, 42, 27, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, "Times New Roman", serif;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .stage {
+      width: min(100vw, 920px);
+      padding: 0;
+      display: grid;
+      gap: 0;
+      justify-items: center;
+    }
+
+    .canvas-wrap {
+      width: 100%;
+      overflow: hidden;
+      background: transparent;
+      min-height: 420px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--button-text);
+      background: var(--button);
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(143, 90, 49, 0.28);
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .status {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-height: 1.25rem;
+      margin: 0;
+      text-align: center;
+      font-size: 0.95rem;
+      background: rgba(255, 252, 247, 0.8);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="canvas-wrap">
+      <canvas id="riveCanvas" aria-label="Donkey mascot animation"></canvas>
+    </div>
+  </main>
+  <div class="controls">
+    <button id="frustatedBtn" type="button">frustated</button>
+    <button id="supriseBtn" type="button">suprise</button>
+  </div>
+  <p id="status" class="status"></p>
+
+  <script src="https://unpkg.com/@rive-app/canvas@2.31.2"></script>
+  <script>
+    const stateMachineName = "State Machine 1";
+    const surpriseAnimationName = "suprised";
+    const status = document.getElementById("status");
+    const frustatedButton = document.getElementById("frustatedBtn");
+    const supriseButton = document.getElementById("supriseBtn");
+    const canvas = document.getElementById("riveCanvas");
+    let riveInstance = null;
+
+    function loadStateMachine(shouldPlay = false) {
+      if (riveInstance) {
+        riveInstance.cleanup();
+      }
+
+      status.textContent = shouldPlay
+        ? `Loading ${stateMachineName}...`
+        : "Ready";
+      riveInstance = new rive.Rive({
+        src: "donkey.riv",
+        canvas,
+        autoplay: shouldPlay,
+        stateMachines: stateMachineName,
+        autoBind: false,
+        onLoad: () => {
+          riveInstance.resizeDrawingSurfaceToCanvas();
+          if (!shouldPlay) {
+            riveInstance.pause();
+            status.textContent = "Ready";
+            return;
+          }
+
+          status.textContent = `Playing ${stateMachineName}`;
+        },
+        onLoadError: (error) => {
+          console.error(error);
+          status.textContent = `Unable to load ${stateMachineName}`;
+        },
+      });
+    }
+
+    function loadAnimation(animationName) {
+      if (riveInstance) {
+        riveInstance.cleanup();
+      }
+
+      status.textContent = `Loading ${animationName}...`;
+      riveInstance = new rive.Rive({
+        src: "donkey.riv",
+        canvas,
+        autoplay: true,
+        animations: animationName,
+        autoBind: false,
+        onLoad: () => {
+          riveInstance.resizeDrawingSurfaceToCanvas();
+          status.textContent = `Playing ${animationName}`;
+        },
+        onLoadError: (error) => {
+          console.error(error);
+          status.textContent = `Unable to load ${animationName}`;
+        },
+      });
+    }
+
+    loadStateMachine();
+
+    frustatedButton.addEventListener("click", () => {
+      loadStateMachine(true);
+    });
+
+    supriseButton.addEventListener("click", () => {
+      loadAnimation(surpriseAnimationName);
+    });
+
+    window.addEventListener("resize", () => {
+      if (riveInstance?.resizeDrawingSurfaceToCanvas) {
+        riveInstance.resizeDrawingSurfaceToCanvas();
+      }
+    });
+  </script>
+</body>
+</html>
