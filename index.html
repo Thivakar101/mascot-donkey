@@ -112,6 +112,7 @@
   <div class="controls">
     <button id="frustatedBtn" type="button">frustated</button>
     <button id="supriseBtn" type="button">suprise</button>
+    <button id="dissapointedBtn" type="button">dissapointed</button>
   </div>
   <p id="status" class="status"></p>
 
@@ -119,9 +120,11 @@
   <script>
     const stateMachineName = "State Machine 1";
     const surpriseAnimationName = "suprised";
+    const disappointedAnimationName = "disappointed";
     const status = document.getElementById("status");
     const frustatedButton = document.getElementById("frustatedBtn");
     const supriseButton = document.getElementById("supriseBtn");
+    const dissapointedButton = document.getElementById("dissapointedBtn");
     const canvas = document.getElementById("riveCanvas");
     let riveInstance = null;
 
@@ -187,6 +190,10 @@
 
     supriseButton.addEventListener("click", () => {
       loadAnimation(surpriseAnimationName);
+    });
+
+    dissapointedButton.addEventListener("click", () => {
+      loadAnimation(disappointedAnimationName);
     });
 
     window.addEventListener("resize", () => {
